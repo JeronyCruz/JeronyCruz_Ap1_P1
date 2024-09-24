@@ -1,10 +1,18 @@
 using JeronyCruz_Ap1_P1.Components;
+using JeronyCruz_Ap1_P1.DAL;
+using JeronyCruz_Ap1_P1.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+var ConStr = builder.Configuration.GetConnectionString("ConStr");
+builder.Services.AddDbContext<Context>(o => o.UseSqlite(ConStr));
+
+builder.Services.AddScoped<Registros>();
 
 var app = builder.Build();
 
