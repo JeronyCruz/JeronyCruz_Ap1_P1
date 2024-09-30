@@ -1,0 +1,71 @@
+﻿@page "/Prestamos/Delete/{PrestamoId:int}"
+@rendermode InteractiveServer
+@inject PrestamosServices prestamosServices
+@inject NavigationManager navigation
+
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-lg border-primary">
+        <div class="card-header">
+            <h5 class="card-title text-center mb-4 bg-primary text-white p-2 rounded">Eliminar Prestamo</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="list-details">
+                <ul class="list-group">
+                    @*Prestamo Id*@
+                    <li class="list-group-item">
+                        <strong> Prestamos Id:</strong> @Prestamos.PrestamoId
+                    </li>
+
+                    @*Deudor*@
+                    <li class="list-group-item">
+                        <strong>Deudor:</strong> @Prestamos.Deudor
+                    </li>
+
+                    @*Concepto*@
+                    <li class="list-group-item">
+                        <strong>Concepto:</strong> @Prestamos.Concepto
+                    </li>
+
+                    @*Monto*@
+                    <li class="list-group-item">
+                        <strong>Monto:</strong> @Prestamos.Monto
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+
+        <div class="card-footer d-flex justify-content-between">
+            <a href="/Prestamos/Index" class="btn btn-primary bi bi-arrow-left mt-3"> Volver</a>
+            <button type="submit" @onclick="Eliminar" class="btn btn-primary btn bi bi-trash"> Eliminar</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int PrestamoId { get; set; }
+    public Prestamos Prestamos { get; set; } = new Prestamos();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Prestamos = await prestamosServices.Buscar(PrestamoId);
+    }
+
+    public async Task Eliminar()
+    {
+        var Eliminar = await prestamosServices.Eliminar(Prestamos.PrestamoId);
+        if(Eliminar)
+        {
+            Console.WriteLine("Se ha eliminado correctamente el Prestamo");
+            navigation.NavigateTo("/Prestamos/Index");
+        }
+        else
+        {
+            Console.WriteLine("No se ha podido eliminar el Prestamo");
+        }
+    }
+
+}
