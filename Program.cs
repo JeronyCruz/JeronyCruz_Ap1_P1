@@ -1,6 +1,7 @@
 using JeronyCruz_Ap1_P1.Components;
 using JeronyCruz_Ap1_P1.DAL;
 using JeronyCruz_Ap1_P1.Models;
+using JeronyCruz_Ap1_P1.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,7 @@ builder.Services.AddRazorComponents()
 var ConStr = builder.Configuration.GetConnectionString("ConStr");
 builder.Services.AddDbContext<Context>(o => o.UseSqlite(ConStr));
 
-builder.Services.AddScoped<Prestamos>();
+builder.Services.AddScoped<PrestamosServices>();
 
 var app = builder.Build();
 
