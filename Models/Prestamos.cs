@@ -8,7 +8,7 @@ namespace JeronyCruz_Ap1_P1.Models
         public int PrestamoId { get; set; }
 
         [Required(ErrorMessage ="Por favor ingresar el nombre del deudor")]
-        public string Dedudor { get; set; }
+        public string Deudor { get; set; }
 
         [Required(ErrorMessage = "Por favor ingresar el concepto")]
         public string Concepto { get; set; }
