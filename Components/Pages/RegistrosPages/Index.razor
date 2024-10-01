@@ -1,5 +1,6 @@
-﻿@page "/Registro/Index"
+﻿@page "/Prestamos/Index"
 @rendermode InteractiveServer
+@inject PrestamosServices prestamosService
 @inject NavigationManager navigation
 
 <PageTitle>Registro</PageTitle>
@@ -10,14 +11,62 @@
 			<h5 class="card-title">Registro</h5>
 		</div>
 		<div class="card-body">
-			<a href="#" class="btn btn-primary"	<span class=" bi bi-plus-square-fill mt-3"></span> Crear</a>
-			<table class="table table-dark table-hover">
+			<div class="row mb-3">
+				<div class="col-md-6">
+					<label for="filtrarPor"> Filtrar por:</label>
+					<InputSelect id="filtrarPor" class="form-select" @bind-Value="FiltroSeleccionado" >
+						<option value="ID">ID</option>
+						<option value="Deudor">Deudor</option>
+					</InputSelect>
+				</div>
+
+				<div class="col-md-6 d-flex justify-content-center mt-4">
+					<div class="input-group">
+						<InputText id="Busqueda" class="form-control" @bind-Value="CriterioBusqueda"></InputText>
+						<button @onclick="BuscarPrestamos" class="btn btn-primary bi bi-search "> Buscar</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mb-3">
+				<div class="col text-end">
+					<a href="/Prestamos/Create" class="btn btn-primary bi bi-plus-square mt-3"> Crear
+					</a>
+				</div>
+			</div>
+
+			<table class="table table-light table-hover">
 				<thead class="table table-striped ">
-					<tr>
+					<tr class="text-center">
+						<th>Prestamo Id</th>
+						<th>Deudor</th>
+						<th>Concepto</th>
+						<th>Monto</th>
+						<th>Detalles</th>
+						<th>Editar</th>
+						<th>Eliminar</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="text-center">
+					@foreach(var prestamos in Prestamos)
+					{
+						<tr class="text-center">
+							<td>@prestamos.PrestamoId</td>
+							<td>@prestamos.Deudor</td>
+							<td>@prestamos.Concepto</td>
+							<td>@prestamos.Monto</td>
+							<td>
+								<a href="/Prestamos/Details/@prestamos.PrestamoId" class="btn btn-primary bi bi-eye"></a>
+							</td>
+							<td>
+								<a href="/Prestamos/Edit/@prestamos.PrestamoId" class="btn btn-primary bi bi-pencil-square"></a>
+							</td>
+							<td>
+								<a href="/Prestamos/Delete/@prestamos.PrestamoId" class="btn btn-primary bi bi-trash"></a>
+							</td>
+						</tr>
+					}
+					@*<tr class="text-center">
 						<a href="#"
 						   class="btn btn-primary">
 							<span class="bi bi-plus-square mt-3"></span> Crear
@@ -40,7 +89,7 @@
 						   class="btn btn-primary">
 							<span class="bi bi-arrow-left mt-3"></span> Volver
 						</a>
-					</tr>
+					</tr>*@
 				</tbody>
 
 			</table>
@@ -51,5 +100,30 @@
 	</div>
 </div>
 @code {
+	public List<Prestamos> Prestamos { get; set; } = new List<Prestamos>();
+	public string FiltroSeleccionado { get; set; } = "ID";
+	public string CriterioBusqueda { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Prestamos = await prestamosService.Listar(a => true);
+	}
+
+	public async Task BuscarPrestamos()
+	{
+		switch (FiltroSeleccionado)
+		{
+			case "ID":
+				if(int.TryParse(CriterioBusqueda, out int id))
+				{
+					Prestamos = await prestamosService.Listar(a => a.PrestamoId == id);
+				}
+				break;
+
+			case "Deudor":
+				Prestamos = await prestamosService.Listar(a => a.Deudor.ToLower().Contains(CriterioBusqueda.ToLower()));
+				break;
+		}
+	}
 
 }
