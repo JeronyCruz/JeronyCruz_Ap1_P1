@@ -1,0 +1,89 @@
+﻿@page "/Prestamos/Edit/{PrestamoId:int}"
+@rendermode InteractiveServer
+@inject PrestamosServices prestamosService
+@inject NavigationManager navigation
+
+<PageTitle>Editar Prestamo</PageTitle>
+
+<EditForm Model="@Prestamos" OnValidSubmit="Guardar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container mt-5">
+        <div class="card p-4 shadow-lg border-primary">
+            <div class="card-header">
+                <h5 class="card-title text-center mb-4 bg-primary text-white p-2 rounded">Editar Prestamo</h5>
+            </div>
+
+            <div class="card-body">
+                @*Prestamo Id*@
+                <div class="mb-3">
+                    <label for="PrestamosId" class="form-label text-primary">Prestamos Id</label>
+                    <InputNumber id="PrestamosId" class="form-control border-primary" @bind-Value="Prestamos.PrestamoId" readonly></InputNumber>
+                </div>
+                @*Deudor*@
+                <div class="mb-3">
+                    <label for="Deudor" class="form-label text-primary">Deudor</label>
+                    <InputText id="Deudor" class="form-control border-primary" @bind-Value="Prestamos.Deudor"></InputText>
+                </div>
+                @*Concepto*@
+                <div class="mb-3">
+                    <label for="Concepto" class="form-label text-primary">Concepto</label>
+                    <InputText id="Concepto" class="form-control border-primary" @bind-Value="Prestamos.Concepto"></InputText>
+                </div>
+
+                @*Monto*@
+                <div class="mb-3">
+                    <label for="Monto" class="form-label text-primary">Monto</label>
+                    <InputNumber id="Monto" class="form-control border-primary" @bind-Value="Prestamos.Monto"></InputNumber>
+                    <ValidationMessage For="@(() => Prestamos.Monto)"></ValidationMessage>
+                    @if (!string.IsNullOrEmpty(Mensaje))
+                    {
+                        <div class="alert alert-danger">
+                            @Mensaje
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card-footer">
+                @if (!string.IsNullOrEmpty(MensajeAlerta))
+                {
+                    <div class="alert alert-success">
+                        @MensajeAlerta
+                    </div>
+                }
+                <a href="/Prestamos/Index" class="btn btn-primary bi bi-arrow-left mt-3"> Volver</a>
+                <button type="submit" class="btn btn-primary bi bi-plus-square mt-3"> Guardar</button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int PrestamoId { get; set; }
+    public Prestamos Prestamos { get; set; } = new Prestamos();
+    public string Mensaje { get; set; } = string.Empty;
+    public string MensajeAlerta { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Prestamos = await prestamosService.Buscar(PrestamoId);
+    }
+
+    public async Task Guardar()
+    {
+        if (Prestamos.Monto <= 0)
+        {
+            Mensaje = "El monto del Prestamo no puede ser menor o igual a 0";
+            return;
+        }
+
+        await prestamosService.Guardar(Prestamos);
+        MensajeAlerta = "Se ha Modificado Corretamente el Prestamo";
+
+    }
+
+}
