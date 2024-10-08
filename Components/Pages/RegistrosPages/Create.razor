@@ -25,7 +25,7 @@
                 @*Deudor*@
                 <div class="mb-3">
                     <label for="Deudor" class="form-label text-primary">Deudor</label>
-                    <InputSelect id="Deudor" class="form-control border-primary" @bind-Value="Prestamos.Deudor">
+                    <InputSelect id="Deudor" class="form-control border-primary" @bind-Value="Prestamos.DeudorId">
                         <option value="" selected disabled>Elija una Opci&oacuten;</option>
                         @foreach(var deudor in Deudores)
                         {
