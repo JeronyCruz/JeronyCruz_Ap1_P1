@@ -54,12 +54,12 @@ namespace JeronyCruz_Ap1_P1.Services
 
         public async Task<Prestamos> Buscar(int id)
         {
-            return await _context.Prestamos.AsNoTracking().FirstOrDefaultAsync(a => a.PrestamoId == id);
+            return await _context.Prestamos.Include(d => d.Deudor).AsNoTracking().FirstOrDefaultAsync(a => a.PrestamoId == id);
         }
 
         public async Task<List<Prestamos>> Listar(Expression<Func<Prestamos, bool>> criterio)
         {
-            return await _context.Prestamos.AsNoTracking().Where(criterio).ToListAsync();   
+            return await _context.Prestamos.Include(d => d.Deudor).AsNoTracking().Where(criterio).ToListAsync();   
         }
     }
 }
