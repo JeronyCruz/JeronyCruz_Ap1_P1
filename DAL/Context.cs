@@ -7,6 +7,8 @@ namespace JeronyCruz_Ap1_P1.DAL
     {
         public DbSet<Prestamos> Prestamos { get; set; }
         public DbSet<Deudores> Deudores { get; set; }
+        public DbSet<Cobros> Cobros { get; set; }
+        public DbSet<CobroDetalle> CobroDetalle { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
