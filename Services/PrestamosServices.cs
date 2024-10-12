@@ -61,5 +61,28 @@ namespace JeronyCruz_Ap1_P1.Services
         {
             return await _context.Prestamos.Include(d => d.Deudor).AsNoTracking().Where(criterio).ToListAsync();   
         }
+
+        public async Task<List<Prestamos>> ObtenerPrestamosPorDeudor(int deudorId)
+        {
+            
+            return await _context.Prestamos
+                                 .Where(p => p.DeudorId == deudorId)
+                                 .ToListAsync();
+        }
+
+        public async Task<Prestamos> GetCliente(int deudorId)
+        {
+            return await _context.Prestamos.FirstOrDefaultAsync(p => p.DeudorId == deudorId);
+        }
+
+        public async Task<Prestamos> ObtenerPorId(int id)
+        {
+            return await _context.Prestamos.FirstOrDefaultAsync(p => p.PrestamoId == id);
+        }
+
+        public async Task<Prestamos?> BuscarPrestamo(int id)
+        {
+            return await _context.Prestamos.Include(p => p.Deudor).FirstOrDefaultAsync(p => p.DeudorId == id);
+        }
     }
 }
