@@ -40,7 +40,7 @@
                             <option value="@deudor.DeudorId">@deudor.Nombres</option>
                         }
                     </InputSelect>
-                    <button type="button" class="btn btn-outline-primary" @onclick="BuscarPrestamosDeDeudor">Buscar</button>
+                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarPrestamosDeDeudor"></button>
                     <ValidationMessage For="@(() => Cobros.DeudorId)" />
                 </div>
 
@@ -54,7 +54,7 @@
                             <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
                         }
                     </InputSelect>
-                    <button type="button" class="btn btn-outline-primary" @onclick="BuscarMontoPrestamo">Buscar</button>
+                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarMontoPrestamo"></button>
                     <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
                 </div>
 
@@ -78,7 +78,7 @@
                         <InputNumber class="form-control ms-3" @bind-Value="NuevoDetalle.ValorCobrado" Step="0.01" />
                         <ValidationMessage For="@(() => NuevoDetalle.ValorCobrado)" />
 
-                        <button type="button" class="btn btn-success ms-3" @onclick="AgregarDetalle">Agregar Detalle</button>
+                        <button type="button" class="btn btn-success ms-3 bi bi-plus-square mt-3" @onclick="AgregarDetalle">Agregar Detalle</button>
                     </div>
 
                     <!-- Tabla para listar los detalles -->
@@ -104,7 +104,7 @@
                                         <ValidationMessage For="@(() => detalle.ValorCobrado)" />
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-danger" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
+                                        <button type="button" class="btn btn-danger bi bi-trash" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
                                     </td>
                                 </tr>
                             }
