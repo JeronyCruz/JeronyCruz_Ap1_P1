@@ -44,19 +44,8 @@
                     <ValidationMessage For="@(() => Cobros.DeudorId)" />
                 </div>
 
-                @*Prestamos Disponibles*@
-                <div class="mb-3 d-flex align-items-center">
-                    <label for="PrestamosDisponibles" class="form-label text-primary">Préstamos Disponibles</label>
-                    <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
-                        <option value="">-- Seleccione un préstamo --</option>
-                        @foreach (var prestamo in PrestamosDisponibles)
-                        {
-                            <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
-                        }
-                    </InputSelect>
-                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarMontoPrestamo"></button>
-                    <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
-                </div>
+                
+                
 
                 @*Monto*@
                 <div class="mb-3">
@@ -70,9 +59,19 @@
 
                     <!-- Formulario para agregar un nuevo detalle -->
                     <div class="mb-3 d-flex align-items-center">
-                        <label for="PrestamoId" class="form-label text-primary">Préstamo Id</label>
-                        <InputNumber class="form-control" @bind-Value="SeleccionadoPrestamoId" readonly />
-                        <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
+                        
+                            <label for="PrestamosDisponibles" class="form-label text-primary">Préstamos Disponibles</label>
+                            <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
+                                <option value="">-- Seleccione un préstamo --</option>
+                                @foreach (var prestamo in PrestamosDisponibles)
+                                {
+                                    <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
+                                }
+                            </InputSelect>
+                            <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarMontoPrestamo"></button>
+                            <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
+                        
+
 
                         <label for="ValorCobrado" class="form-label text-primary ms-3">Valor Cobrado</label>
                         <InputNumber class="form-control ms-3" @bind-Value="NuevoDetalle.ValorCobrado" Step="0.01" />
@@ -95,8 +94,14 @@
                             {
                                 <tr>
                                     <td>
-                                        <InputNumber class="form-control" @bind-Value="detalle.PrestamoId" readonly />
-                                        <ValidationMessage For="@(() => detalle.PrestamoId)" />
+                                        <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
+                                            <option value="">-- Seleccione un préstamo --</option>
+                                            @foreach (var prestamo in PrestamosDisponibles)
+                                            {
+                                                <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
+                                            }
+                                        </InputSelect>
+                                        <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
                                     </td>
 
                                     <td>
