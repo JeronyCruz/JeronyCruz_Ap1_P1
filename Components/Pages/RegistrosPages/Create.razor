@@ -1,6 +1,7 @@
 ﻿@page "/Prestamos/Create"
 @rendermode InteractiveServer
 @inject PrestamosServices prestamosService
+@inject DeudorServices deudoresServices
 @inject NavigationManager navigation
 
 <PageTitle>Crear Prestamo</PageTitle>
@@ -24,7 +25,14 @@
                 @*Deudor*@
                 <div class="mb-3">
                     <label for="Deudor" class="form-label text-primary">Deudor</label>
-                    <InputText id="Deudor" class="form-control border-primary" @bind-Value="Prestamos.Deudor"></InputText>
+                    <InputSelect id="Deudor" class="form-control border-primary" @bind-Value="Prestamos.DeudorId">
+                        <option value="" selected disabled>Elija una Opci&oacuten;</option>
+                        @foreach(var deudor in Deudores)
+                        {
+                            <option value="@deudor.DeudorId">@deudor.Nombres</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="(() => Prestamos.Deudor)" />
                 </div>
                 @*Concepto*@
                 <div class="mb-3">
@@ -57,7 +65,21 @@
 
 @code {
     public Prestamos Prestamos { get; set; } = new Prestamos();
+    public List<Deudores> Deudores { get; set; } = new List<Deudores>();
     public string Mensaje { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Deudores = await deudoresServices.Listar(d => d.DeudorId > 0);
+        }
+        catch (Exception ex)
+        {
+            Mensaje = "Error al cargar los deudores: " + ex.Message;
+        }
+    }
+
 
     public async Task Guardar()
     {

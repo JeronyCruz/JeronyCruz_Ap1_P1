@@ -16,7 +16,6 @@
 					<label for="filtrarPor"> Filtrar por:</label>
 					<InputSelect id="filtrarPor" class="form-select" @bind-Value="FiltroSeleccionado" >
 						<option value="ID">ID</option>
-						<option value="Deudor">Deudor</option>
 					</InputSelect>
 				</div>
 
@@ -52,7 +51,7 @@
 					{
 						<tr class="text-center">
 							<td>@prestamos.PrestamoId</td>
-							<td>@prestamos.Deudor</td>
+							<td>@prestamos.Deudor.Nombres</td>
 							<td>@prestamos.Concepto</td>
 							<td>@prestamos.Monto</td>
 							<td>
@@ -120,9 +119,6 @@
 				}
 				break;
 
-			case "Deudor":
-				Prestamos = await prestamosService.Listar(a => a.Deudor.ToLower().Contains(CriterioBusqueda.ToLower()));
-				break;
 		}
 	}
 

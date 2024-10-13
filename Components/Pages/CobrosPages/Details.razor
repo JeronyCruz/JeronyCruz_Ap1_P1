@@ -1,0 +1,60 @@
+﻿@page "/Cobros/Details/{CobroId:int}"
+@rendermode InteractiveServer
+@inject PrestamosServices prestamosServices
+@inject DeudorServices deudorServices
+@inject CobrosServices cobroServices
+@inject NavigationManager navigation
+
+<PageTitle>Detalles Cobros</PageTitle>
+
+<div class="container mt-5">
+    <div class="card p-4 shadow-lg border-primary">
+        <div class="card-header">
+            <h5 class="card-title text-center mb-4 bg-primary text-white p-2 rounded">Detalles Cobro</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="list-details">
+                <ul class="list-group">
+                    @*Cobro Id*@
+                    <li class="list-group-item">
+                        <strong> Cobro Id:</strong> @Cobros.CobroId
+                    </li>
+
+                    @*Fecha*@
+                    <li class="list-group-item">
+                        <strong>Fecha:</strong> @Cobros.Fecha
+                    </li>
+
+                    @*Monto*@
+                    <li class="list-group-item">
+                        <strong>Monto Cobrado:</strong> @Cobros.Monto.ToString("N2")
+                    </li>
+
+
+                    @*Deudor*@
+                    <li class="list-group-item">
+                        <strong>Deudor:</strong> @Cobros.Deudores?.Nombres
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <div class="card-footer d-flex justify-content-between">
+            <a href="/Cobros/Index" class="btn btn-outline-primary bi bi-arrow-left mt-3"> Volver</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int CobroId { get; set; }
+    public Cobros Cobros { get; set; } = new Cobros();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cobros = await cobroServices.Buscar(CobroId);
+    }
+
+}

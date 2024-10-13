@@ -1,0 +1,128 @@
+﻿@page "/Cobros/Index"
+@rendermode InteractiveServer
+@inject PrestamosServices prestamosService
+@inject DeudorServices deudorServices
+@inject CobrosServices cobroServices
+@inject NavigationManager navigation
+
+<PageTitle>Registro Cobro</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+
+		<div class="card-header">
+			<h5 class="card-title">Registro</h5>
+		</div>
+		<div class="card-body">
+			<div class="row mb-3">
+				<div class="col-md-6">
+					<label for="filtrarPor"> Filtrar por:</label>
+					<InputSelect id="filtrarPor" class="form-select" @bind-Value="FiltroSeleccionado">
+						<option value="ID">ID</option>
+					</InputSelect>
+				</div>
+
+				<div class="col-md-6 d-flex justify-content-center mt-4">
+					<div class="input-group">
+						<InputText id="Busqueda" class="form-control" @bind-Value="CriterioBusqueda"></InputText>
+						<button @onclick="BuscarPrestamos" class="btn btn-primary bi bi-search "> Buscar</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="row mb-3">
+				<div class="col text-end">
+					<a href="/Cobros/Create" class="btn btn-primary bi bi-plus-square mt-3">
+						Crear
+					</a>
+				</div>
+			</div>
+
+			<table class="table table-light table-hover">
+				<thead class="table table-striped ">
+					<tr class="text-center">
+						<th>Cobro Id</th>
+						<th>Fecha</th>
+						<th>Monto Cobrado</th>
+						<th>Deudor</th>
+						<th>Detalles</th>
+						<th>Editar</th>
+						<th>Eliminar</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var cobro in Cobros)
+					{
+						<tr class="text-center">
+							<td>@cobro.CobroId</td>
+							<td>@cobro.Fecha.ToString("dd/MM/yyyy")</td>
+							<td>@cobro.Monto.ToString("N2")</td>
+							<td>@cobro.Deudores?.Nombres</td>
+							<td>
+								<a href="/Cobros/Details/@cobro.CobroId" class="btn btn-primary bi bi-eye"></a>
+							</td>
+							<td>
+								<a href="/Cobros/Edit/@cobro.CobroId" class="btn btn-primary bi bi-pencil-square"></a>
+							</td>
+							<td>
+								<a href="/Cobros/Delete/@cobro.CobroId" class="btn btn-primary bi bi-trash"></a>
+							</td>
+						</tr>
+					}
+					@*<tr class="text-center">
+					<a href="#"
+					class="btn btn-primary">
+					<span class="bi bi-plus-square mt-3"></span> Crear
+					</a>
+					<td class="text-center">
+					<a href="#" class="btn bi bi-eye"></a>
+					</td>
+					<td class="text-center">
+					<a href="#" class="btn bi bi-pencil-square"></a>
+					</td>
+					<td class="text-center">
+					<a href="#" class="btn bi bi-trash"></a>
+					</td>
+
+					<a href="#"
+					class="btn btn-primary">
+					<span class="bi bi-floppy mt-3"></span> Guardar
+					</a>
+					<a href="#"
+					class="btn btn-primary">
+					<span class="bi bi-arrow-left mt-3"></span> Volver
+					</a>
+					</tr>*@
+				</tbody>
+
+			</table>
+		</div>
+		<div class="card-footer">
+		</div>
+
+	</div>
+</div>
+@code {
+	public List<Cobros> Cobros { get; set; } = new List<Cobros>();
+	public string FiltroSeleccionado { get; set; } = "ID";
+	public string CriterioBusqueda { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Cobros = await cobroServices.Listar(a => true);
+	}
+
+	public async Task BuscarPrestamos()
+	{
+		switch (FiltroSeleccionado)
+		{
+			case "ID":
+				if (int.TryParse(CriterioBusqueda, out int id))
+				{
+					Cobros = await cobroServices.Listar(a => a.CobroId == id);
+				}
+				break;
+
+		}
+	}
+
+}
