@@ -117,7 +117,9 @@
                     </table>
                 </div>
 
-
+                <div>
+                    <h6> Total Cobrado: @ValorTotalCobrado.ToString("N2")</h6>
+                </div>
 
                 @if (!string.IsNullOrEmpty(mensajeError))
                 {
@@ -144,6 +146,7 @@
     public string Nombre { get; set; } = string.Empty;
 
     private int? SeleccionadoPrestamoId { get; set; }
+    public double ValorTotalCobrado => Cobros.CobroDetalles.Sum(d => d.ValorCobrado);
 
     protected override async Task OnInitializedAsync()
     {
