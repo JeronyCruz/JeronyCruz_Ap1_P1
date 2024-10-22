@@ -34,7 +34,7 @@
                     <label for="DeudorId" class="form-label text-primary">Deudor</label>
                     <div class="input-group">
 
-                        <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobros.DeudorId" @onchange="CargarPrestamosDeDeudor">
+                        <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobros.DeudorId">
                             <option value="">-- Seleccione un deudor --</option>
                             @foreach (var deudor in Deudores)
                             {
