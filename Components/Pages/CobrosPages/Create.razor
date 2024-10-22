@@ -69,7 +69,7 @@
                         <InputNumber class="form-control ms-3" @bind-Value="DetalleSeleccionado.ValorCobrado" Step="0.01" />
                         <ValidationMessage For="@(() => DetalleSeleccionado.ValorCobrado)" />
 
-                        <button type="button" class="btn btn-success ms-3 bi bi-plus-square mt-3" @onclick="AgregarDetalle">Agregar Detalle</button>
+                        <button type="button" class="btn btn-success ms-3 bi bi-plus-square mt-3" @onclick="HandlePrestamoSelected">Agregar Detalle</button>
                     </div>
 
                     <!-- Tabla para listar los detalles -->
@@ -273,7 +273,7 @@
 
 
 
-    public void AgregarDetalle()
+    public void HandlePrestamoSelected()
     {
         mensajeError = string.Empty;
 
