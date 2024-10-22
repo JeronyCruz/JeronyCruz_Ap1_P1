@@ -12,7 +12,8 @@ namespace JeronyCruz_Ap1_P1.Services
 
         public async Task<bool> Existe(int id)
         {
-           return await _context.Prestamos.AnyAsync(a => a.PrestamoId == id);
+           return await _context.Prestamos
+                .AnyAsync(a => a.PrestamoId == id);
         }
 
         private async Task<bool> Insertar(Prestamos prestamos)
@@ -54,12 +55,19 @@ namespace JeronyCruz_Ap1_P1.Services
 
         public async Task<Prestamos> Buscar(int id)
         {
-            return await _context.Prestamos.Include(d => d.Deudor).AsNoTracking().FirstOrDefaultAsync(a => a.PrestamoId == id);
+            return await _context.Prestamos
+                .Include(d => d.Deudor)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.PrestamoId == id);
         }
 
         public async Task<List<Prestamos>> Listar(Expression<Func<Prestamos, bool>> criterio)
         {
-            return await _context.Prestamos.Include(d => d.Deudor).AsNoTracking().Where(criterio).ToListAsync();   
+            return await _context.Prestamos
+                .Include(d => d.Deudor)
+                .AsNoTracking()
+                .Where(criterio)
+                .ToListAsync();   
         }
 
         public async Task<List<Prestamos>> ObtenerPrestamosPorDeudor(int deudorId)
@@ -72,17 +80,30 @@ namespace JeronyCruz_Ap1_P1.Services
 
         public async Task<Prestamos> GetCliente(int deudorId)
         {
-            return await _context.Prestamos.FirstOrDefaultAsync(p => p.DeudorId == deudorId);
+            return await _context.Prestamos
+                .FirstOrDefaultAsync(p => p.DeudorId == deudorId);
+        }
+
+        public async Task<List<Prestamos>> GetPrestamosPendientes(int deudorId)
+        {
+            return await context.Prestamos
+                .Where(p => p.DeudorId == deudorId && p.Balance > 0)
+                .OrderBy(p => p.PrestamoId)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<Prestamos> ObtenerPorId(int id)
         {
-            return await _context.Prestamos.FirstOrDefaultAsync(p => p.PrestamoId == id);
+            return await _context.Prestamos
+                .FirstOrDefaultAsync(p => p.PrestamoId == id);
         }
 
         public async Task<Prestamos?> BuscarPrestamo(int id)
         {
-            return await _context.Prestamos.Include(p => p.Deudor).FirstOrDefaultAsync(p => p.DeudorId == id);
+            return await _context.Prestamos
+                .Include(p => p.Deudor)
+                .FirstOrDefaultAsync(p => p.DeudorId == id);
         }
     }
 }
