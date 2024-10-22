@@ -138,7 +138,7 @@
     public CobroDetalle DetalleSeleccionado { get; set; } = new CobroDetalle();
     public string mensajeError { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
-
+    public double ValorAplicar { get; set; }
     private int? SeleccionadoPrestamoId { get; set; }
     public double ValorTotalCobrado => Cobro.CobroDetalles.Sum(d => d.ValorCobrado);
 
@@ -308,6 +308,40 @@
         {
             mensajeError = "Debe seleccionar un préstamo para agregar el detalle.";
         }
+    }
+
+    private async Task AplicarValor()
+    {
+        Cobro.CobroDetalles.Clear();
+        if (ValorAplicar > 0)
+        {
+
+            var prestamosPendientes = await prestamosServices
+                .GetPrestamosPendientes(Cobro.DeudorId);
+            foreach (var prestamo in prestamosPendientes)
+            {
+                double valorCobrado = 0;
+                if (prestamo.Balance < ValorAplicar)
+                    valorCobrado = prestamo.Balance;
+                else
+                    valorCobrado = ValorAplicar;
+
+                ValorAplicar -= valorCobrado;
+
+                Cobro.CobroDetalles.Add(
+                    new CobroDetalle()
+                        {
+                            PrestamoId = prestamo.PrestamoId,
+                            ValorCobrado = valorCobrado
+                        }
+                );
+            }
+
+
+        }
+
+
+
     }
 
 
