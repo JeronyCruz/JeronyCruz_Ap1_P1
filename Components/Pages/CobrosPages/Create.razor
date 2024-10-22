@@ -134,53 +134,11 @@
         }
     }
 
-    public async Task CargarPrestamosDeDeudor(ChangeEventArgs e)
-    {
-        mensajeError = string.Empty;
-
-        if (int.TryParse(e.Value?.ToString(), out int deudorId) && deudorId > 0)
-        {
-            ListaPrestamos = await prestamosServices.Listar(p => p.DeudorId == deudorId);
-        }
-        else
-        {
-            ListaPrestamos.Clear();
-            mensajeError = "Debe seleccionar un deudor válido.";
-        }
-    }
-
     public async Task BuscarPrestamosPendientes()
     {
         ListaPrestamos = await prestamosServices
             .GetPrestamosPendientes(Cobro.DeudorId);
     }
-
-    public async Task BuscarMontoPrestamo()
-    {
-        mensajeError = string.Empty;
-
-        if (SeleccionadoPrestamoId.HasValue)
-        {
-            var prestamo = await prestamosServices.ObtenerPorId(SeleccionadoPrestamoId.Value);
-            if (prestamo != null)
-            {
-                
-                Cobro.Monto = prestamo.Monto;
-
-                
-            }
-            else
-            {
-                mensajeError = "No se encontró el préstamo seleccionado.";
-            }
-        }
-        else
-        {
-            mensajeError = "Debe seleccionar un préstamo válido.";
-        }
-    }
-
-
 
     public void HandlePrestamoSelected()
     {
@@ -249,11 +207,7 @@
 
         }
 
-
-
     }
-
-
 
     public void RemoverDetalle(CobroDetalle detalle)
     {
