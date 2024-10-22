@@ -30,16 +30,19 @@
                 </div>
 
                 @*Deudor Id*@
-                <div class="mb-3 d-flex align-items-center">
-                    <label for="DeudorId" class="form-label text-primary">Seleccionar Deudor</label>
-                    <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobros.DeudorId" @onchange="CargarPrestamosDeDeudor">
-                        <option value="">-- Seleccione un deudor --</option>
-                        @foreach (var deudor in Deudores)
-                        {
-                            <option value="@deudor.DeudorId">@deudor.Nombres</option>
-                        }
-                    </InputSelect>
-                    <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarPrestamosDeDeudor"></button>
+                <div class="mb-3">
+                    <label for="DeudorId" class="form-label text-primary">Deudor</label>
+                    <div class="input-group">
+
+                        <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobros.DeudorId" @onchange="CargarPrestamosDeDeudor">
+                            <option value="">-- Seleccione un deudor --</option>
+                            @foreach (var deudor in Deudores)
+                            {
+                                <option value="@deudor.DeudorId">@deudor.Nombres</option>
+                            }
+                        </InputSelect>
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarPrestamosDeDeudor"></button>
+                    </div>
                     <ValidationMessage For="@(() => Cobros.DeudorId)" />
                 </div>
 
