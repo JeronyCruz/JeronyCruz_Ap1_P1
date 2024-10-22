@@ -7,7 +7,7 @@
 
 <PageTitle> Crear Cobros</PageTitle>
 
-<EditForm Model="@Cobros" OnValidSubmit="Guardar">
+<EditForm Model="@Cobro" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
 
     <div class="container">
@@ -20,13 +20,13 @@
                 @*Cobro ID*@
                 <div class="mb-3">
                     <label for="CobroId" class="form-label text-primary">Cobro</label>
-                    <InputNumber class="form-control" @bind-Value="Cobros.CobroId" readonly></InputNumber>
+                    <InputNumber class="form-control" @bind-Value="Cobro.CobroId" readonly></InputNumber>
                 </div>
 
                 @*Fecha*@
                 <div class="mb-3">
                     <label for="fecha" class="form-label text-primary">Fecha</label>
-                    <InputDate class="form-control" @bind-Value="Cobros.Fecha"></InputDate>
+                    <InputDate class="form-control" @bind-Value="Cobro.Fecha"></InputDate>
                 </div>
 
                 @*Deudor Id*@
@@ -34,7 +34,7 @@
                     <label for="DeudorId" class="form-label text-primary">Deudor</label>
                     <div class="input-group">
 
-                        <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobros.DeudorId">
+                        <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobro.DeudorId">
                             <option value="0" selected disabled>Seleccione un deudor</option>
                             @foreach (var deudor in ListaDeudores)
                             {
@@ -43,7 +43,7 @@
                         </InputSelect>
                         <button type="button" class="btn btn-outline-success bi bi-arrow-clockwise" @onclick="BuscarPrestamosDeDeudor"></button>
                     </div>
-                    <ValidationMessage For="@(() => Cobros.DeudorId)" />
+                    <ValidationMessage For="@(() => Cobro.DeudorId)" />
                 </div>
 
                 
@@ -82,7 +82,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var detalle in Cobros.CobroDetalles)
+                            @foreach (var detalle in Cobro.CobroDetalles)
                             {
                                 <tr>
                                     <td>
@@ -109,22 +109,30 @@
                     </table>
                 </div>
 
-                <div>
-                    <h6> Total Cobrado: @ValorTotalCobrado.ToString("N2")</h6>
+                <div class="row">
+                    <div class="col-6 offset-6">
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Monto</strong></label>
+                            <label class="form-control text-end"><strong>@Cobro.Monto</strong></label>
+
+                            <ValidationMessage For="(() => Cobro.Monto)" />
+                        </div>
+                    </div>
                 </div>
 
             </div>
-        </div>
+        
 
-        <div class="card-footer text-center mt-2">
-            <a href="/Cobros/Index" class="btn btn-outline-primary bi bi-arrow-left"> Volver</a>
-            <button type="submit" class="btn btn-outline-success bi bi-floppy"> Guardar</button>
+            <div class="card-footer text-center mt-2">
+                <a href="/Cobros/Index" class="btn btn-outline-primary bi bi-arrow-left"> Volver</a>
+                <button type="submit" class="btn btn-outline-success bi bi-floppy"> Guardar</button>
+            </div>
         </div>
     </div>
 </EditForm>
 
 @code {
-    public Cobros? Cobros { get; set; } = new Cobros();
+    public Cobros? Cobro { get; set; } = new Cobros();
     public List<Deudores> ListaDeudores { get; set; } = new List<Deudores>();
     public List<Prestamos> PrestamosDisponibles { get; set; } = new List<Prestamos>();
     public CobroDetalle DetalleSeleccionado { get; set; } = new CobroDetalle();
@@ -132,7 +140,7 @@
     public string Nombre { get; set; } = string.Empty;
 
     private int? SeleccionadoPrestamoId { get; set; }
-    public double ValorTotalCobrado => Cobros.CobroDetalles.Sum(d => d.ValorCobrado);
+    public double ValorTotalCobrado => Cobro.CobroDetalles.Sum(d => d.ValorCobrado);
 
     protected override async Task OnInitializedAsync()
     {
@@ -144,14 +152,14 @@
         mensajeError = string.Empty;
 
 
-        if (Cobros.CobroDetalles.Count == 0)
+        if (Cobro.CobroDetalles.Count == 0)
         {
             mensajeError = "Debe agregar al menos un detalle.";
             return;
         }
 
 
-        foreach (var detalle in Cobros.CobroDetalles)
+        foreach (var detalle in Cobro.CobroDetalles)
         {
             if (detalle.ValorCobrado <= 0)
             {
@@ -159,7 +167,7 @@
                 return;
             }
             var prestamo = await prestamosServices.ObtenerPorId(detalle.PrestamoId);
-            var sumaCobrada = Cobros.CobroDetalles
+            var sumaCobrada = Cobro.CobroDetalles
                 .Where(d => d.PrestamoId == detalle.PrestamoId)
                 .Sum(d => d.ValorCobrado);
 
@@ -171,12 +179,12 @@
         }
 
 
-        Cobros.Monto = Cobros.CobroDetalles.Sum(d => d.ValorCobrado);
+        Cobro.Monto = Cobro.CobroDetalles.Sum(d => d.ValorCobrado);
 
 
-        if (!await cobroServices.Existe(Cobros.CobroId))
+        if (!await cobroServices.Existe(Cobro.CobroId))
         {
-            var resultado = await cobroServices.Guardar(Cobros);
+            var resultado = await cobroServices.Guardar(Cobro);
             if (resultado)
             {
                 // Actualizar el monto de los préstamos involucrados
@@ -191,7 +199,7 @@
                 }*/
 
                 // Limpiar el formulario y navegar
-                Cobros = new Cobros();
+                Cobro = new Cobros();
                 navigation.NavigateTo("/Cobros/Index");
             }
             else
@@ -224,9 +232,9 @@
     {
         mensajeError = string.Empty;
 
-        if (Cobros.DeudorId > 0)
+        if (Cobro.DeudorId > 0)
         {
-            PrestamosDisponibles = await prestamosServices.Listar(p => p.DeudorId == Cobros.DeudorId);
+            PrestamosDisponibles = await prestamosServices.Listar(p => p.DeudorId == Cobro.DeudorId);
             if (!PrestamosDisponibles.Any())
             {
                 mensajeError = "No se encontraron préstamos para el deudor seleccionado.";
@@ -248,7 +256,7 @@
             if (prestamo != null)
             {
                 
-                Cobros.Monto = prestamo.Monto;
+                Cobro.Monto = prestamo.Monto;
 
                 
             }
@@ -278,7 +286,7 @@
                 return;
             }
 
-            var sumaCobrada = Cobros.CobroDetalles
+            var sumaCobrada = Cobro.CobroDetalles
                 .Where(d => d.PrestamoId == SeleccionadoPrestamoId.Value)
                 .Sum(d => d.ValorCobrado);
 
@@ -288,7 +296,7 @@
                 return;
             }
 
-            Cobros.CobroDetalles.Add(new CobroDetalle
+            Cobro.CobroDetalles.Add(new CobroDetalle
                 {
                     PrestamoId = SeleccionadoPrestamoId.Value,
                     ValorCobrado = DetalleSeleccionado.ValorCobrado
@@ -306,7 +314,7 @@
 
     public void EliminarDetalle(CobroDetalle detalle)
     {
-        Cobros.CobroDetalles.Remove(detalle);
+        Cobro.CobroDetalles.Remove(detalle);
         DetalleSeleccionado.ValorCobrado = detalle.ValorCobrado;
 
     }
