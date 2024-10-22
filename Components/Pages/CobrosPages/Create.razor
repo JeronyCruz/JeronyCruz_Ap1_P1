@@ -104,7 +104,7 @@
 </EditForm>
 
 @code {
-    public Cobros? Cobro { get; set; } = new Cobros();
+    public Cobros Cobro { get; set; } = new Cobros();
     public List<Deudores> ListaDeudores { get; set; } = new List<Deudores>();
     public List<Prestamos> ListaPrestamos { get; set; } = new List<Prestamos>();
     public CobroDetalle DetalleSeleccionado { get; set; } = new CobroDetalle();
@@ -116,7 +116,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListaDeudores = await deudorServices.Listar(d => true);
+        ListaDeudores = await deudorServices
+        .Listar(d => true);
     }
 
     public async Task Guardar()
@@ -126,7 +127,7 @@
         if (paso)
         {
 
-            navigation.NavigateTo("/Cobro/Index");
+            navigation.NavigateTo("/Cobros/Index");
         }
         else
         {
@@ -140,41 +141,19 @@
             .GetPrestamosPendientes(Cobro.DeudorId);
     }
 
-    public void HandlePrestamoSelected()
+    private async Task HandlePrestamoSelected((Prestamos prestamo, double valor) selection)
     {
-        mensajeError = string.Empty;
-
-        if (SeleccionadoPrestamoId.HasValue)
-        {
-            var prestamo = ListaPrestamos.FirstOrDefault(p => p.PrestamoId == SeleccionadoPrestamoId.Value);
-            if (DetalleSeleccionado.ValorCobrado <= 0)
+        var detalle = new CobroDetalle
             {
-                mensajeError = "El valor cobrado debe ser mayor a 0.";
-                return;
-            }
+                PrestamoId = selection.prestamo.PrestamoId,
+                ValorCobrado = selection.valor
+            };
 
-            var sumaCobrada = Cobro.CobroDetalles
-                .Where(d => d.PrestamoId == SeleccionadoPrestamoId.Value)
-                .Sum(d => d.ValorCobrado);
+        Cobro.CobroDetalles.Add(detalle);
+        Cobro.Monto = Cobro.CobroDetalles.Sum(d => d.ValorCobrado);
 
-            if (prestamo != null && (sumaCobrada + DetalleSeleccionado.ValorCobrado) > prestamo.Monto)
-            {
-                mensajeError = $"El valor total cobrado para el préstamo {SeleccionadoPrestamoId.Value} no puede exceder el monto disponible de {prestamo.Monto}.";
-                return;
-            }
-
-            Cobro.CobroDetalles.Add(new CobroDetalle
-                {
-                    PrestamoId = SeleccionadoPrestamoId.Value,
-                    ValorCobrado = DetalleSeleccionado.ValorCobrado
-                });
-
-            DetalleSeleccionado = new CobroDetalle();
-        }
-        else
-        {
-            mensajeError = "Debe seleccionar un préstamo para agregar el detalle.";
-        }
+        DetalleSeleccionado = new CobroDetalle();
+        await Task.CompletedTask;
     }
 
     private async Task AplicarValor()
