@@ -47,15 +47,6 @@
                 </div>
 
                 
-                
-
-                @*Monto*@
-                <div class="mb-3">
-                    <label for="Monto" class="form-label text-primary">Monto</label>
-                    <InputNumber class="form-control" @bind-Value="Cobros.Monto" Step="0.01" readonly></InputNumber>
-                </div>
-
-                
                 <div class="border border-success p-3 mt-3">
                     <h5>Detalles del Cobro</h5>
 
@@ -122,12 +113,6 @@
                     <h6> Total Cobrado: @ValorTotalCobrado.ToString("N2")</h6>
                 </div>
 
-                @if (!string.IsNullOrEmpty(mensajeError))
-                {
-                    <div class="alert alert-danger" role="alert">
-                        @mensajeError
-                    </div>
-                }
             </div>
         </div>
 
