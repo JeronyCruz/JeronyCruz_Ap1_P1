@@ -36,7 +36,7 @@
 
                         <InputSelect id="DeudorId" class="form-control border-primary" @bind-Value="Cobros.DeudorId">
                             <option value="0" selected disabled>Seleccione un deudor</option>
-                            @foreach (var deudor in Deudores)
+                            @foreach (var deudor in ListaDeudores)
                             {
                                 <option value="@deudor.DeudorId">@deudor.Nombres</option>
                             }
@@ -141,7 +141,7 @@
 
 @code {
     public Cobros? Cobros { get; set; } = new Cobros();
-    public List<Deudores> Deudores { get; set; } = new List<Deudores>();
+    public List<Deudores> ListaDeudores { get; set; } = new List<Deudores>();
     public List<Prestamos> PrestamosDisponibles { get; set; } = new List<Prestamos>();
     public CobroDetalle NuevoDetalle { get; set; } = new CobroDetalle();
     public string mensajeError { get; set; } = string.Empty;
@@ -152,7 +152,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Deudores = await deudorServices.Listar(d => true);
+        ListaDeudores = await deudorServices.Listar(d => true);
     }
 
     public async Task Guardar()
