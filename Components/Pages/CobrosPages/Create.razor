@@ -66,8 +66,8 @@
 
 
                         <label for="ValorCobrado" class="form-label text-primary ms-3">Valor Cobrado</label>
-                        <InputNumber class="form-control ms-3" @bind-Value="NuevoDetalle.ValorCobrado" Step="0.01" />
-                        <ValidationMessage For="@(() => NuevoDetalle.ValorCobrado)" />
+                        <InputNumber class="form-control ms-3" @bind-Value="DetalleSeleccionado.ValorCobrado" Step="0.01" />
+                        <ValidationMessage For="@(() => DetalleSeleccionado.ValorCobrado)" />
 
                         <button type="button" class="btn btn-success ms-3 bi bi-plus-square mt-3" @onclick="AgregarDetalle">Agregar Detalle</button>
                     </div>
@@ -127,7 +127,7 @@
     public Cobros? Cobros { get; set; } = new Cobros();
     public List<Deudores> ListaDeudores { get; set; } = new List<Deudores>();
     public List<Prestamos> PrestamosDisponibles { get; set; } = new List<Prestamos>();
-    public CobroDetalle NuevoDetalle { get; set; } = new CobroDetalle();
+    public CobroDetalle DetalleSeleccionado { get; set; } = new CobroDetalle();
     public string mensajeError { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
 
@@ -272,7 +272,7 @@
         if (SeleccionadoPrestamoId.HasValue)
         {
             var prestamo = PrestamosDisponibles.FirstOrDefault(p => p.PrestamoId == SeleccionadoPrestamoId.Value);
-            if (NuevoDetalle.ValorCobrado <= 0)
+            if (DetalleSeleccionado.ValorCobrado <= 0)
             {
                 mensajeError = "El valor cobrado debe ser mayor a 0.";
                 return;
@@ -282,7 +282,7 @@
                 .Where(d => d.PrestamoId == SeleccionadoPrestamoId.Value)
                 .Sum(d => d.ValorCobrado);
 
-            if (prestamo != null && (sumaCobrada + NuevoDetalle.ValorCobrado) > prestamo.Monto)
+            if (prestamo != null && (sumaCobrada + DetalleSeleccionado.ValorCobrado) > prestamo.Monto)
             {
                 mensajeError = $"El valor total cobrado para el préstamo {SeleccionadoPrestamoId.Value} no puede exceder el monto disponible de {prestamo.Monto}.";
                 return;
@@ -291,10 +291,10 @@
             Cobros.CobroDetalles.Add(new CobroDetalle
                 {
                     PrestamoId = SeleccionadoPrestamoId.Value,
-                    ValorCobrado = NuevoDetalle.ValorCobrado
+                    ValorCobrado = DetalleSeleccionado.ValorCobrado
                 });
 
-            NuevoDetalle = new CobroDetalle();
+            DetalleSeleccionado = new CobroDetalle();
         }
         else
         {
@@ -307,7 +307,7 @@
     public void EliminarDetalle(CobroDetalle detalle)
     {
         Cobros.CobroDetalles.Remove(detalle);
-        NuevoDetalle.ValorCobrado = detalle.ValorCobrado;
+        DetalleSeleccionado.ValorCobrado = detalle.ValorCobrado;
 
     }
 }
