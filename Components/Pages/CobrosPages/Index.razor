@@ -50,7 +50,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var cobro in Cobros)
+					@foreach (var cobro in ListaCobros)
 					{
 						<tr class="text-center">
 							<td>@cobro.CobroId</td>
@@ -96,19 +96,23 @@
 
 			</table>
 		</div>
-		<div class="card-footer">
+		<div class="card-footer space-between">
+			<label class="ms-3"><strong>Cantidad:</strong> @ListaCobros.Count</label>
+			<div class="col-5">
+				<label class="ms-5"><strong>Total:</strong> $@ListaCobros.Sum(p => p.Monto).ToString("N2")</label>
+			</div>
 		</div>
 
 	</div>
 </div>
 @code {
-	public List<Cobros> Cobros { get; set; } = new List<Cobros>();
+	public List<Cobros> ListaCobros { get; set; } = new List<Cobros>();
 	public string FiltroSeleccionado { get; set; } = "ID";
 	public string CriterioBusqueda { get; set; } = string.Empty;
 
 	protected override async Task OnInitializedAsync()
 	{
-		Cobros = await cobroServices.Listar(a => true);
+		ListaCobros = await cobroServices.Listar(a => true);
 	}
 
 	public async Task BuscarPrestamos()
@@ -118,7 +122,7 @@
 			case "ID":
 				if (int.TryParse(CriterioBusqueda, out int id))
 				{
-					Cobros = await cobroServices.Listar(a => a.CobroId == id);
+					ListaCobros = await cobroServices.Listar(a => a.CobroId == id);
 				}
 				break;
 
