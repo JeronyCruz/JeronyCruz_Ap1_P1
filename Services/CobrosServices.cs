@@ -1,6 +1,7 @@
 ﻿using JeronyCruz_Ap1_P1.DAL;
 using JeronyCruz_Ap1_P1.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 using System.Linq.Expressions;
 
 namespace JeronyCruz_Ap1_P1.Services
@@ -12,62 +13,35 @@ namespace JeronyCruz_Ap1_P1.Services
 
         public async Task<bool> Existe(int id)
         {
-            return await _context.Cobros.AnyAsync(a => a.CobroId == id);
+            return await _context.Cobros
+                .AnyAsync(a => a.CobroId == id);
         }
 
         private async Task<bool> Insertar(Cobros cobros)
         {
-            _context.Cobros.Add(cobros);
-            return await _context.SaveChangesAsync() > 0;
+            context.Cobros.Add(cobros);
+            await AfectarPrestamos(cobros.CobroDetalles.ToArray(), TipoOperacion.Resta);
+            return await context.SaveChangesAsync() > 0;
         }
 
         private async Task<bool> Modificar(Cobros cobros)
         {
-            var existingCobros = await _context.Cobros
-                .Include(c => c.CobroDetalles)
-                .FirstOrDefaultAsync(c => c.CobroId == cobros.CobroId);
-
-            if (existingCobros != null)
-            {
-                
-                _context.Entry(existingCobros).CurrentValues.SetValues(cobros);
-
-               
-                var detallesToRemove = existingCobros.CobroDetalles
-                    .Where(d => !cobros.CobroDetalles.Any(cd => cd.DetalleId == d.DetalleId))
-                    .ToList();
-
-                foreach (var detalle in detallesToRemove)
-                {
-                    _context.CobroDetalle.Remove(detalle);
-                }
-
-                
-                foreach (var nuevoDetalle in cobros.CobroDetalles)
-                {
-                    if (nuevoDetalle.DetalleId > 0)
-                    {
-                        var existingDetalle = existingCobros.CobroDetalles
-                            .FirstOrDefault(d => d.DetalleId == nuevoDetalle.DetalleId);
-
-                        if (existingDetalle != null)
-                        {
-                            
-                            _context.Entry(existingDetalle).CurrentValues.SetValues(nuevoDetalle);
-                        }
-                    }
-                    else 
-                    {
-                        existingCobros.CobroDetalles.Add(nuevoDetalle);
-                    }
-                }
-
-                return await _context.SaveChangesAsync() > 0;
-            }
-
-            return false; 
+            context.Update(cobros);
+            return await context.SaveChangesAsync() > 0;
         }
 
+        private async Task AfectarPrestamos(CobroDetalle[] detalle, TipoOperacion tipoOperacion)
+        {
+            foreach (var item in detalle)
+            {
+                var prestamo = await context.Prestamos.SingleAsync(p => p.PrestamoId == item.PrestamoId);
+                if (tipoOperacion == TipoOperacion.Resta)
+                    prestamo.Balance -= item.ValorCobrado;
+                else
+                    prestamo.Balance += item.ValorCobrado;
+
+            }
+        }
 
         public async Task<bool> Guardar(Cobros cobros)
         {
@@ -77,26 +51,40 @@ namespace JeronyCruz_Ap1_P1.Services
                 return await Modificar(cobros);
         }
 
-        public async Task<bool> Eliminar(int id)
+        public async Task<bool> Eliminar(int cobroId)
         {
-            var Cobros = await _context.Cobros.FindAsync(id);
-            if (Cobros != null)
-            {
-                _context.Cobros.Remove(Cobros);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            return false;
+            
+            var cobro = await context.Cobros
+                .Include(c => c.CobroDetalles)
+                .FirstOrDefaultAsync(c => c.CobroId == cobroId);
+
+            if (cobro == null) return false;
+
+            await AfectarPrestamos(cobro.CobroDetalles.ToArray(), TipoOperacion.Suma);
+
+            context.CobroDetalle.RemoveRange(cobro.CobroDetalles);
+            context.Cobros.Remove(cobro);
+            var cantidad = await context.SaveChangesAsync();
+            return cantidad > 0;
         }
 
         public async Task<Cobros> Buscar(int id)
         {
-            return await _context.Cobros.Include(d => d.Deudores).Include(d => d.CobroDetalles).AsNoTracking().FirstOrDefaultAsync(a => a.CobroId == id);
+            return await _context.Cobros
+                .Include(d => d.Deudores)
+                .Include(d => d.CobroDetalles)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.CobroId == id);
         }
 
         public async Task<List<Cobros>> Listar(Expression<Func<Cobros, bool>> criterio)
         {
-            return await _context.Cobros.Include(d => d.Deudores).Include(d => d.CobroDetalles).AsNoTracking().Where(criterio).ToListAsync();
+            return await _context.Cobros
+                .Include(d => d.Deudores)
+                .Include(d => d.CobroDetalles)
+                .AsNoTracking()
+                .Where(criterio)
+                .ToListAsync();
         }
 
         public async Task<Cobros> ObtenerPorId(int id)
@@ -106,5 +94,11 @@ namespace JeronyCruz_Ap1_P1.Services
                 .FirstOrDefaultAsync(c => c.CobroId == id);
         }
 
+    }
+
+    public enum TipoOperacion
+    {
+        Suma = 1,
+        Resta = 2
     }
 }
