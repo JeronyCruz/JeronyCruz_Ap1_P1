@@ -13,5 +13,12 @@ namespace JeronyCruz_Ap1_P1.Services
         {
             return await _context.Deudores.AsNoTracking().Where(criterio).ToListAsync();
         }
+
+        public async Task<Deudores> Buscar(int deudorId)
+        {
+            return await _context.Deudores
+                .AsNoTracking()
+                .FirstOrDefaultAsync(d => d.DeudorId == deudorId);
+        }
     }
 }

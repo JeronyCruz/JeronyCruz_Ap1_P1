@@ -24,41 +24,30 @@ namespace JeronyCruz_Ap1_P1.Services
 
         private async Task<bool> Modificar(Prestamos prestamos)
         {
-            var existingPrestamos = await _context.Prestamos.FindAsync(prestamos.PrestamoId);
-            if(existingPrestamos != null)
-            {
-                _context.Entry(existingPrestamos).CurrentValues.SetValues(prestamos);
-                return await _context.SaveChangesAsync() > 0;
-            }
-            return false;
+            _context.Update(prestamos);
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> Guardar(Prestamos prestamos)
         {
+            prestamos.Balance = prestamos.Monto;
             if (!await Existe(prestamos.PrestamoId))
                 return await Insertar(prestamos);
             else
                 return await Modificar(prestamos);
         }
 
-        public async Task<bool> Eliminar(int id)
+        public async Task<Prestamos> Buscar(int prestamoId)
         {
-            var Prestamos = await _context.Prestamos.FindAsync(id);
-            if(Prestamos != null)
-            {
-                _context.Prestamos.Remove(Prestamos);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            return false;
+            return await _context.Prestamos.Include(d => d.Deudor)
+                .FirstOrDefaultAsync(p => p.PrestamoId == prestamoId);
         }
 
-        public async Task<Prestamos> Buscar(int id)
+        public async Task<bool> Eliminar(int prestamoId)
         {
             return await _context.Prestamos
-                .Include(d => d.Deudor)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.PrestamoId == id);
+                .Where(p => p.PrestamoId == prestamoId)
+                .ExecuteDeleteAsync() > 0;
         }
 
         public async Task<List<Prestamos>> Listar(Expression<Func<Prestamos, bool>> criterio)
@@ -67,7 +56,23 @@ namespace JeronyCruz_Ap1_P1.Services
                 .Include(d => d.Deudor)
                 .AsNoTracking()
                 .Where(criterio)
-                .ToListAsync();   
+                .ToListAsync();
+        }
+
+        public async Task<Prestamos?> BuscarPrestamo(int id)
+        {
+            return await _context.Prestamos
+                .Include(p => p.Deudor)
+                .FirstOrDefaultAsync(p => p.PrestamoId == id);
+        }
+
+        public async Task<List<Prestamos>> GetList(Expression<Func<Prestamos, bool>> criterio)
+        {
+            return await _context.Prestamos
+                .Include(d => d.Deudor)
+                .Where(criterio)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<List<Prestamos>> ObtenerPrestamosPorDeudor(int deudorId)
@@ -84,26 +89,20 @@ namespace JeronyCruz_Ap1_P1.Services
                 .FirstOrDefaultAsync(p => p.DeudorId == deudorId);
         }
 
-        public async Task<List<Prestamos>> GetPrestamosPendientes(int deudorId)
-        {
-            return await context.Prestamos
-                .Where(p => p.DeudorId == deudorId && p.Balance > 0)
-                .OrderBy(p => p.PrestamoId)
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
         public async Task<Prestamos> ObtenerPorId(int id)
         {
             return await _context.Prestamos
                 .FirstOrDefaultAsync(p => p.PrestamoId == id);
         }
 
-        public async Task<Prestamos?> BuscarPrestamo(int id)
+        public async Task<List<Prestamos>> GetPrestamosPendientes(int deudorId)
         {
             return await _context.Prestamos
-                .Include(p => p.Deudor)
-                .FirstOrDefaultAsync(p => p.DeudorId == id);
+                .Where(p => p.DeudorId == deudorId && p.Balance > 0)
+                .OrderBy(p => p.PrestamoId)
+                .AsNoTracking()
+                .ToListAsync();
         }
+
     }
 }
