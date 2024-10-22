@@ -41,7 +41,7 @@
                                 <option value="@deudor.DeudorId">@deudor.Nombres</option>
                             }
                         </InputSelect>
-                        <button type="button" class="btn btn-outline-success bi bi-arrow-clockwise" @onclick="BuscarPrestamosDeDeudor"></button>
+                        <button type="button" class="btn btn-outline-success bi bi-arrow-clockwise" @onclick="BuscarPrestamosPendientes"></button>
                     </div>
                     <ValidationMessage For="@(() => Cobro.DeudorId)" />
                 </div>
@@ -55,7 +55,7 @@
                             <label for="PrestamosDisponibles" class="form-label text-primary">Préstamos Disponibles</label>
                             <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
                                 <option value="">-- Seleccione un préstamo --</option>
-                                @foreach (var prestamo in PrestamosDisponibles)
+                                @foreach (var prestamo in ListaPrestamos)
                                 {
                                     <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
                                 }
@@ -88,7 +88,7 @@
                                     <td>
                                         <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
                                             <option value="">-- Seleccione un préstamo --</option>
-                                            @foreach (var prestamo in PrestamosDisponibles)
+                                            @foreach (var prestamo in ListaPrestamos)
                                             {
                                                 <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
                                             }
@@ -134,7 +134,7 @@
 @code {
     public Cobros? Cobro { get; set; } = new Cobros();
     public List<Deudores> ListaDeudores { get; set; } = new List<Deudores>();
-    public List<Prestamos> PrestamosDisponibles { get; set; } = new List<Prestamos>();
+    public List<Prestamos> ListaPrestamos { get; set; } = new List<Prestamos>();
     public CobroDetalle DetalleSeleccionado { get; set; } = new CobroDetalle();
     public string mensajeError { get; set; } = string.Empty;
     public string Nombre { get; set; } = string.Empty;
@@ -219,31 +219,19 @@
 
         if (int.TryParse(e.Value?.ToString(), out int deudorId) && deudorId > 0)
         {
-            PrestamosDisponibles = await prestamosServices.Listar(p => p.DeudorId == deudorId);
+            ListaPrestamos = await prestamosServices.Listar(p => p.DeudorId == deudorId);
         }
         else
         {
-            PrestamosDisponibles.Clear();
+            ListaPrestamos.Clear();
             mensajeError = "Debe seleccionar un deudor válido.";
         }
     }
 
-    public async Task BuscarPrestamosDeDeudor()
+    public async Task BuscarPrestamosPendientes()
     {
-        mensajeError = string.Empty;
-
-        if (Cobro.DeudorId > 0)
-        {
-            PrestamosDisponibles = await prestamosServices.Listar(p => p.DeudorId == Cobro.DeudorId);
-            if (!PrestamosDisponibles.Any())
-            {
-                mensajeError = "No se encontraron préstamos para el deudor seleccionado.";
-            }
-        }
-        else
-        {
-            mensajeError = "Debe seleccionar un deudor válido.";
-        }
+        ListaPrestamos = await prestamosServices
+            .GetPrestamosPendientes(Cobro.DeudorId);
     }
 
     public async Task BuscarMontoPrestamo()
@@ -279,7 +267,7 @@
 
         if (SeleccionadoPrestamoId.HasValue)
         {
-            var prestamo = PrestamosDisponibles.FirstOrDefault(p => p.PrestamoId == SeleccionadoPrestamoId.Value);
+            var prestamo = ListaPrestamos.FirstOrDefault(p => p.PrestamoId == SeleccionadoPrestamoId.Value);
             if (DetalleSeleccionado.ValorCobrado <= 0)
             {
                 mensajeError = "El valor cobrado debe ser mayor a 0.";
