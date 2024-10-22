@@ -149,67 +149,16 @@
 
     public async Task Guardar()
     {
-        mensajeError = string.Empty;
+        var paso = await cobroServices.Guardar(Cobro);
 
-
-        if (Cobro.CobroDetalles.Count == 0)
+        if (paso)
         {
-            mensajeError = "Debe agregar al menos un detalle.";
-            return;
-        }
 
-
-        foreach (var detalle in Cobro.CobroDetalles)
-        {
-            if (detalle.ValorCobrado <= 0)
-            {
-                mensajeError = $"El valor cobrado en el préstamo {detalle.PrestamoId} debe ser mayor a 0.";
-                return;
-            }
-            var prestamo = await prestamosServices.ObtenerPorId(detalle.PrestamoId);
-            var sumaCobrada = Cobro.CobroDetalles
-                .Where(d => d.PrestamoId == detalle.PrestamoId)
-                .Sum(d => d.ValorCobrado);
-
-            if (prestamo != null && sumaCobrada > prestamo.Monto)
-            {
-                mensajeError = $"El valor total cobrado para el préstamo {detalle.PrestamoId} no puede exceder el monto disponible de {prestamo.Monto}.";
-                return;
-            }
-        }
-
-
-        Cobro.Monto = Cobro.CobroDetalles.Sum(d => d.ValorCobrado);
-
-
-        if (!await cobroServices.Existe(Cobro.CobroId))
-        {
-            var resultado = await cobroServices.Guardar(Cobro);
-            if (resultado)
-            {
-                // Actualizar el monto de los préstamos involucrados
-                /*foreach (var detalle in Cobros.CobroDetalles)
-                    {
-                    var prestamo = await prestamosServices.ObtenerPorId(detalle.PrestamoId);
-                    if (prestamo != null)
-                        {
-                        prestamo.Monto -= detalle.ValorCobrado;
-                        await prestamosServices.Guardar(prestamo);  // Actualizar el préstamo en la base de datos
-                }
-                }*/
-
-                // Limpiar el formulario y navegar
-                Cobro = new Cobros();
-                navigation.NavigateTo("/Cobros/Index");
-            }
-            else
-            {
-                mensajeError = "Error al guardar el cobro.";
-            }
+            navigation.NavigateTo("/Cobro/Index");
         }
         else
         {
-            mensajeError = "Error: el Id ya existe. Por favor, elija otro Id.";
+            
         }
     }
 
