@@ -47,66 +47,38 @@
                 </div>
 
                 
+                @* Detalles del Cobro *@
                 <div class="border border-success p-3 mt-3">
                     <h5>Detalles del Cobro</h5>
 
-                    <div class="mb-3 d-flex align-items-center">
-                        
-                            <label for="PrestamosDisponibles" class="form-label text-primary">Préstamos Disponibles</label>
-                            <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
-                                <option value="">-- Seleccione un préstamo --</option>
-                                @foreach (var prestamo in ListaPrestamos)
-                                {
-                                    <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
-                                }
-                            </InputSelect>
-                            <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="BuscarMontoPrestamo"></button>
-                            <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
-                        
-
-
-                        <label for="ValorCobrado" class="form-label text-primary ms-3">Valor Cobrado</label>
-                        <InputNumber class="form-control ms-3" @bind-Value="DetalleSeleccionado.ValorCobrado" Step="0.01" />
-                        <ValidationMessage For="@(() => DetalleSeleccionado.ValorCobrado)" />
-
-                        <button type="button" class="btn btn-success ms-3 bi bi-plus-square mt-3" @onclick="HandlePrestamoSelected">Agregar Detalle</button>
-                    </div>
-
-                    <!-- Tabla para listar los detalles -->
+                    <PrestamoPicker Prestamos="ListaPrestamos"
+                                    PrestamoId="DetalleSeleccionado.PrestamoId"
+                                    Valor="DetalleSeleccionado.ValorCobrado"
+                                    OnPrestamoSelected="HandlePrestamoSelected" />
+                    <hr />
                     <table class="table table-light">
                         <thead class="table table-striped">
-                            <tr>
-                                <th>Prestamo Id</th>
-                                <th>Valor Cobrado</th>
-                                <th>Acciones</th>
+                            <tr class="Text-center">
+                                <th>Pr&eacute;stamo</th>
+                                <th>Cobrado</th>
+                                <th>Remover</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var detalle in Cobro.CobroDetalles)
                             {
                                 <tr>
+                                    <td>@detalle.PrestamoId</td>
+                                    <td>@detalle.ValorCobrado</td>
                                     <td>
-                                        <InputSelect id="PrestamosDisponibles" class="form-control border-primary" @bind-Value="SeleccionadoPrestamoId">
-                                            <option value="">-- Seleccione un préstamo --</option>
-                                            @foreach (var prestamo in ListaPrestamos)
-                                            {
-                                                <option value="@prestamo.PrestamoId">@prestamo.Concepto</option>
-                                            }
-                                        </InputSelect>
-                                        <ValidationMessage For="@(() => SeleccionadoPrestamoId)" />
-                                    </td>
-
-                                    <td>
-                                        <InputNumber class="form-control" @bind-Value="detalle.ValorCobrado" Step="0.01" />
-                                        <ValidationMessage For="@(() => detalle.ValorCobrado)" />
-                                    </td>
-                                    <td>
-                                        <button type="button" class="btn btn-danger bi bi-trash" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
+                                        <button type="button" class="btn btn-outline-danger bi bi-trash"
+                                                @onclick="() => RemoverDetalle(detalle)"></button>
                                     </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
+                    <hr />
                 </div>
 
                 <div class="row">
@@ -283,7 +255,7 @@
 
 
 
-    public void EliminarDetalle(CobroDetalle detalle)
+    public void RemoverDetalle(CobroDetalle detalle)
     {
         Cobro.CobroDetalles.Remove(detalle);
         DetalleSeleccionado.ValorCobrado = detalle.ValorCobrado;
